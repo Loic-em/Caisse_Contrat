@@ -1,0 +1,254 @@
+.sidebar {
+  position: sticky;
+  top: 0;
+  width: 270px;
+  height: 100vh;
+  flex: 0 0 270px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 28px 17px 19px;
+  color: #f5f2e8;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgb(72 125 96 / 24%), transparent 19rem),
+    linear-gradient(165deg, #173f36 0%, #12372f 56%, #102e29 100%);
+  border-right: 1px solid rgb(255 255 255 / 8%);
+  box-shadow: 12px 0 32px rgb(22 44 36 / 8%);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 9px;
+  margin: 0 0 42px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 14px 14px 14px 5px;
+  color: #163d34;
+  background: linear-gradient(145deg, #f1dba8, #c99e56);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgb(7 22 17 / 25%);
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-copy strong {
+  color: #fffdf6;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .1px;
+}
+
+.brand-copy span {
+  margin-top: 2px;
+  color: #bdcfc5;
+  font-size: 11px;
+  letter-spacing: .25px;
+}
+
+.workspace-label {
+  padding: 0 11px;
+  margin-bottom: 13px;
+  color: #b6cabc;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 1.5px;
+}
+
+.nav-group + .nav-group {
+  margin-top: 29px;
+}
+
+.nav-group-title {
+  padding: 0 11px;
+  margin: 0 0 9px;
+  color: #9db8a8;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .75px;
+}
+
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 45px;
+  padding: 0 12px;
+  margin: 3px 0;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: #d0ddd4;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.nav-link .icon {
+  color: #b3c9b9;
+}
+
+.nav-link:hover {
+  color: #fffdf6;
+  background: rgb(255 255 255 / 8%);
+  transform: translateX(2px);
+}
+
+.nav-link.active {
+  border-color: rgb(237 218 175 / 30%);
+  color: #fff9e8;
+  background: linear-gradient(100deg, rgb(199 160 91 / 22%), rgb(255 255 255 / 7%));
+  box-shadow: inset 3px 0 #d9b36b;
+  font-weight: 650;
+}
+
+.nav-link.active .icon {
+  color: #ebcb8d;
+  stroke-width: 2;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.sidebar-note {
+  display: flex;
+  gap: 10px;
+  padding: 13px 11px;
+  border: 1px solid rgb(219 232 217 / 16%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 5%);
+}
+
+.note-icon {
+  flex: 0 0 auto;
+  color: #e0c185;
+}
+
+.sidebar-note p {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.sidebar-note strong {
+  color: #fff8e6;
+  font-size: 11px;
+}
+
+.sidebar-note p span {
+  color: #bed0c4;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 6px 0;
+  color: #a9beb0;
+  font-size: 10px;
+}
+
+.footer-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d8b46c;
+  box-shadow: 0 0 0 4px rgb(216 180 108 / 14%);
+}
+
+.brand:focus-visible,
+.nav-link:focus-visible {
+  outline: 2px solid #e6c982;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1050px) {
+  .sidebar {
+    width: 238px;
+    flex-basis: 238px;
+  }
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    flex: 0 0 auto;
+    padding: 13px 16px 10px;
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid rgb(255 255 255 / 10%);
+  }
+
+  .brand {
+    margin: 0 0 12px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px 12px 12px 4px;
+    font-size: 20px;
+  }
+
+  .workspace-label,
+  .sidebar-bottom,
+  .nav-group-title {
+    display: none;
+  }
+
+  .main-nav {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 0 0 3px;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(224 193 133 / 55%) transparent;
+  }
+
+  .nav-group,
+  .nav-group + .nav-group {
+    display: contents;
+    margin: 0;
+  }
+
+  .nav-link {
+    width: auto;
+    min-width: max-content;
+    min-height: 38px;
+    gap: 7px;
+    padding: 0 11px;
+    font-size: 11px;
+  }
+
+  .nav-link .icon {
+    width: 16px;
+    height: 16px;
+  }
+}

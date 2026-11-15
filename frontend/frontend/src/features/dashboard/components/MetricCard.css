@@ -1,0 +1,108 @@
+/* Style des cartes d'indicateur et de leurs couleurs d'identification. */
+.metric-card {
+  position: relative;
+  min-height: 153px;
+  padding: 18px 19px;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  box-sizing: border-box;
+  box-shadow: var(--shadow-card);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.metric-card::after {
+  position: absolute;
+  right: -25px;
+  bottom: -34px;
+  width: 96px;
+  height: 96px;
+  border: 1px solid rgb(187 139 67 / 15%);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.metric-card:hover {
+  transform: translateY(-3px);
+  border-color: #d5d9c9;
+  box-shadow: var(--shadow-card-hover);
+}
+
+.metric-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+}
+
+.metric-icon.purple {
+  color: #266552;
+  background: #e7f0e5;
+}
+
+.metric-icon.blue {
+  color: #55778b;
+  background: #eaf1f1;
+}
+
+.metric-icon.green {
+  color: #387b5c;
+  background: #e8f1e5;
+}
+
+.metric-icon.orange {
+  color: #a87432;
+  background: #f7efdf;
+}
+
+.metric-placeholder {
+  color: var(--color-forest);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.metric-card h3 {
+  margin: 12px 0 4px;
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.metric-card p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@media (max-width: 1050px) {
+  .metric-card {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  /* Réduit les espacements et la typographie pour conserver quatre cartes lisibles en grille. */
+  .metric-card {
+    min-height: 136px;
+    padding: 14px;
+  }
+
+  .metric-card h3 {
+    font-size: 11px;
+  }
+
+  .metric-card p {
+    font-size: 9px;
+  }
+}

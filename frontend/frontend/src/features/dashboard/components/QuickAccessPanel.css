@@ -1,0 +1,96 @@
+/* Carte des boutons qui conduisent directement vers les modules de travail. */
+.shortcuts-panel {
+  min-height: 237px;
+  padding: 21px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  box-sizing: border-box;
+  box-shadow: var(--shadow-card);
+}
+
+.shortcuts-panel .panel-heading h2 {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.shortcuts-panel .panel-heading p {
+  margin: 5px 0 0;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.shortcut-list {
+  margin-top: 14px;
+}
+
+.shortcut-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border: 0;
+  border-top: 1px solid #f0f1f5;
+  background: transparent;
+  color: var(--color-muted);
+  text-align: left;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.shortcut-item:hover {
+  color: var(--color-forest-bright);
+}
+
+.shortcut-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+}
+
+.shortcut-icon.purple {
+  color: #266552;
+  background: #e7f0e5;
+}
+
+.shortcut-icon.blue {
+  color: #55778b;
+  background: #eaf1f1;
+}
+
+.shortcut-copy {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.shortcut-copy strong {
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.shortcut-copy small {
+  color: var(--color-muted);
+  font-size: 10px;
+}
+
+.shortcut-item:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .shortcuts-panel {
+    min-height: 210px;
+  }
+}

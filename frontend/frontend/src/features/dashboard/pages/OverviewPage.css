@@ -1,0 +1,127 @@
+/* Mise en page du tableau de bord : titre, indicateurs, panneaux et pied de page. */
+.section-title-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin: 32px 0 15px;
+}
+
+.section-title-row .eyebrow {
+  margin: 0 0 5px;
+}
+
+.section-title-row h2 {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -.2px;
+}
+
+.data-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px;
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.data-note span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-brass);
+}
+
+.data-note-error {
+  color: #9e4f3d;
+}
+
+.data-note-error span {
+  background: var(--color-coral);
+}
+
+.data-note-error button {
+  padding: 4px 7px;
+  border: 1px solid #e5c4ba;
+  border-radius: 8px;
+  color: #974d3d;
+  background: var(--color-paper);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 16px;
+  margin-top: 19px;
+}
+
+.page-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 23px;
+  color: var(--color-muted-light);
+  font-size: 10px;
+}
+
+.footer-separator {
+  padding: 0 4px;
+  color: var(--color-brass);
+}
+
+@media (max-width: 1050px) {
+  /* Deux colonnes gardent les cartes lisibles sur les écrans intermédiaires. */
+  .content-page {
+    padding-right: 27px;
+    padding-left: 27px;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  /* Les panneaux s'empilent sur mobile pour éviter des colonnes trop étroites. */
+  .content-page {
+    padding: 22px 16px 18px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .section-title-row {
+    align-items: start;
+    gap: 8px;
+  }
+
+  .data-note {
+    max-width: 115px;
+    justify-content: end;
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  .metric-grid {
+    gap: 9px;
+  }
+
+  .page-footer {
+    gap: 12px;
+    font-size: 8px;
+  }
+}
