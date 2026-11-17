@@ -45,6 +45,27 @@ public class CashRequest {
     @Column(name = "attachment_name", length = 255)
     private String attachmentName;
 
+    @Column(name = "activity_area", length = 160)
+    private String activityArea;
+
+    @Column(name = "activity_details", length = 160)
+    private String activityDetails;
+
+    @Column(name = "client_partner", length = 160)
+    private String clientPartner;
+
+    @Column(name = "mission_purpose", length = 2000)
+    private String missionPurpose;
+
+    @Column(name = "mission_reference", length = 120)
+    private String missionReference;
+
+    @Column(name = "contact_name", length = 160)
+    private String contactName;
+
+    @Column(name = "contact_phone", length = 50)
+    private String contactPhone;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")
     private UserAccount requester;
@@ -107,11 +128,57 @@ public class CashRequest {
             UserAccount requester,
             Instant createdAt,
             Instant updatedAt) {
+        this(id, subject, location, startDate, endDate, category, estimatedAmount,
+                attachmentName, null, null, null, null, requester, createdAt, updatedAt);
+    }
+
+    public CashRequest(
+            UUID id,
+            String subject,
+            String location,
+            LocalDate startDate,
+            LocalDate endDate,
+            String category,
+            BigDecimal estimatedAmount,
+            String attachmentName,
+            String missionPurpose,
+            String missionReference,
+            String contactName,
+            String contactPhone,
+            UserAccount requester,
+            Instant createdAt,
+            Instant updatedAt) {
+        this(id, subject, location, startDate, endDate, category, estimatedAmount, attachmentName,
+                missionPurpose, missionReference, contactName, contactPhone, null, null, null,
+                requester, createdAt, updatedAt);
+    }
+
+    public CashRequest(
+            UUID id,
+            String subject,
+            String location,
+            LocalDate startDate,
+            LocalDate endDate,
+            String category,
+            BigDecimal estimatedAmount,
+            String attachmentName,
+            String missionPurpose,
+            String missionReference,
+            String contactName,
+            String contactPhone,
+            String activityArea,
+            String activityDetails,
+            String clientPartner,
+            UserAccount requester,
+            Instant createdAt,
+            Instant updatedAt) {
         this.id = id;
         this.requester = requester;
         this.status = CashRequestStatus.DRAFT;
         this.createdAt = createdAt;
-        updateDetails(subject, location, startDate, endDate, category, estimatedAmount, attachmentName, updatedAt);
+        updateDetails(subject, location, startDate, endDate, category, estimatedAmount,
+                attachmentName, missionPurpose, missionReference, contactName, contactPhone,
+                activityArea, activityDetails, clientPartner, updatedAt);
     }
 
     public void updateDetails(
@@ -139,15 +206,65 @@ public class CashRequest {
         this.updatedAt = updatedAt;
     }
 
+    public void updateDetails(
+            String subject,
+            String location,
+            LocalDate startDate,
+            LocalDate endDate,
+            String category,
+            BigDecimal estimatedAmount,
+            String attachmentName,
+            String missionPurpose,
+            String missionReference,
+            String contactName,
+            String contactPhone,
+            Instant updatedAt) {
+        updateDetails(subject, location, startDate, endDate, category, estimatedAmount, attachmentName,
+                missionPurpose, missionReference, contactName, contactPhone, null, null, null, updatedAt);
+    }
+
+    public void updateDetails(
+            String subject,
+            String location,
+            LocalDate startDate,
+            LocalDate endDate,
+            String category,
+            BigDecimal estimatedAmount,
+            String attachmentName,
+            String missionPurpose,
+            String missionReference,
+            String contactName,
+            String contactPhone,
+            String activityArea,
+            String activityDetails,
+            String clientPartner,
+            Instant updatedAt) {
+        updateDetails(subject, location, startDate, endDate, category, estimatedAmount, attachmentName, updatedAt);
+        this.missionPurpose = normalizeOptional(missionPurpose, "Les details complementaires", 2000);
+        this.missionReference = normalizeOptional(missionReference, "La reference de mission", 120);
+        this.contactName = normalizeOptional(contactName, "Le contact sur place", 160);
+        this.contactPhone = normalizeOptional(contactPhone, "Le telephone du contact", 50);
+        this.activityArea = normalizeOptional(activityArea, "L'activite DIGIN concernee", 160);
+        this.activityDetails = normalizeOptional(activityDetails, "Le detail de l'activite", 160);
+        this.clientPartner = normalizeOptional(clientPartner, "Le client ou partenaire", 160);
+    }
+
     public void submit(UserAccount managerN1, UserAccount managerN2, Instant at) {
         if (status != CashRequestStatus.DRAFT && status != CashRequestStatus.A_CORRIGER) {
-            throw new IllegalArgumentException("Seuls un brouillon ou une demande à corriger peuvent être soumis.");
+            throw new IllegalArgumentException("Seuls un brouillon ou une demande a corriger peuvent etre soumis.");
         }
         if (managerN1 == null) {
-            throw new IllegalArgumentException("Le responsable N+1 du demandeur n’est pas défini.");
+            throw new IllegalArgumentException("Le responsable N+1 du demandeur n'est pas defini.");
+        }
+        if (requester == null || requester.getId().equals(managerN1.getId())) {
+            throw new IllegalArgumentException("Le demandeur ne peut pas etre son propre valideur N+1.");
         }
         if (managerN1.getRole() != AccountRole.DIRECTEUR_GENERAL && managerN2 == null) {
-            throw new IllegalArgumentException("Le responsable N+2 du demandeur n’est pas défini.");
+            throw new IllegalArgumentException("Le responsable N+2 du demandeur n'est pas defini.");
+        }
+        if (managerN2 != null && (managerN2.getId().equals(requester.getId())
+                || managerN2.getId().equals(managerN1.getId()))) {
+            throw new IllegalArgumentException("Les responsables N+1 et N+2 doivent etre distincts du demandeur et entre eux.");
         }
         this.validatorN1 = managerN1;
         this.validatorN2 = managerN1.getRole() == AccountRole.DIRECTEUR_GENERAL ? null : managerN2;
@@ -262,6 +379,17 @@ public void markInRegularization(LocalDate today, Instant at) {
         return value.trim();
     }
 
+    private String normalizeOptional(String value, String label, int maxLength) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String normalized = value.trim();
+        if (normalized.length() > maxLength) {
+            throw new IllegalArgumentException(label + " ne peut pas d?passer " + maxLength + " caract?res.");
+        }
+        return normalized;
+    }
+
     private LocalDate validateDate(LocalDate value, String label) {
         if (value == null) {
             throw new IllegalArgumentException(label + " est obligatoire.");
@@ -299,6 +427,34 @@ public void markInRegularization(LocalDate today, Instant at) {
 
     public String getAttachmentName() {
         return attachmentName;
+    }
+
+    public String getActivityArea() {
+        return activityArea;
+    }
+
+    public String getActivityDetails() {
+        return activityDetails;
+    }
+
+    public String getClientPartner() {
+        return clientPartner;
+    }
+
+    public String getMissionPurpose() {
+        return missionPurpose;
+    }
+
+    public String getMissionReference() {
+        return missionReference;
+    }
+
+    public String getContactName() {
+        return contactName;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
     }
 
     public UserAccount getRequester() {

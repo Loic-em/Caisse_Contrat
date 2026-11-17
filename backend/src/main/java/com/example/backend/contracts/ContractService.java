@@ -50,7 +50,7 @@ public class ContractService {
     public List<ContractResponse> list(String actorEmail) {
         UserAccount actor = findActiveAccount(actorEmail);
         requireContractAccess(actor);
-        List<EmploymentContract> visibleContracts = canManageAny(actor)
+        List<EmploymentContract> visibleContracts = canViewAllContracts(actor)
                 ? contracts.findAllByOrderByUpdatedAtDesc()
                 : contracts.findAllByEmployeeIdOrderByUpdatedAtDesc(actor.getId());
         recordEvent(null, actor, "CONTRACT_LIST_VIEWED");
@@ -71,7 +71,6 @@ public class ContractService {
         requireManagerAccess(actor);
         return accounts.findAll(Sort.by("lastName", "firstName")).stream()
                 .filter(account -> account.getStatus() == AccountStatus.ACTIVE)
-                .filter(account -> account.getRole() != AccountRole.ADMINISTRATEUR)
                 .filter(account -> canEditEmployee(actor, account))
                 .map(ContractEmployeeResponse::from)
                 .toList();
@@ -109,6 +108,10 @@ public class ContractService {
                 payload.workplace(),
                 supervisor,
                 payload.internalNotes(),
+                payload.baseSalaryAmount(),
+                payload.monthlyBonusAmount(),
+                payload.bonusDetails(),
+                payload.otherBenefits(),
                 actor.getId(),
                 now);
         contracts.save(contract);
@@ -138,6 +141,10 @@ public class ContractService {
                 payload.workplace(),
                 supervisor,
                 payload.internalNotes(),
+                payload.baseSalaryAmount(),
+                payload.monthlyBonusAmount(),
+                payload.bonusDetails(),
+                payload.otherBenefits(),
                 clock.instant());
         recordEvent(contract.getId(), actor, "CONTRACT_UPDATED");
         return toResponse(contract, actor);
@@ -224,7 +231,7 @@ public class ContractService {
         requireContractAccess(actor);
         EmploymentContract contract = contracts.findById(contractId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Le contrat est introuvable."));
-        if (!canManageAny(actor) && !contract.getEmployee().getId().equals(actor.getId())) {
+        if (!canViewAllContracts(actor) && !contract.getEmployee().getId().equals(actor.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous n’avez pas accès à ce contrat.");
         }
         return contract;
@@ -249,6 +256,10 @@ public class ContractService {
                 contract.getDepartment(),
                 contract.getProbationPeriod(),
                 contract.getWorkplace(),
+                contract.getBaseSalaryAmount(),
+                contract.getMonthlyBonusAmount(),
+                contract.getBonusDetails(),
+                contract.getOtherBenefits(),
                 supervisor.getId(),
                 supervisor.getFirstName() + " " + supervisor.getLastName(),
                 showInternalNotes ? contract.getInternalNotes() : null,
@@ -259,11 +270,7 @@ public class ContractService {
 
     private void requireContractAccess(UserAccount actor) {
         if (actor.getRole() == AccountRole.ADMINISTRATEUR) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "L’administrateur n’a pas accès aux contrats.");
-        }
-        if (!canManageAny(actor) && actor.getRole() != AccountRole.ADJOINT_COMPTABLE
-                && actor.getRole() != null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous n’avez pas accès aux contrats.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "L'administrateur n'a pas acces aux contrats.");
         }
     }
 
@@ -271,6 +278,10 @@ public class ContractService {
         if (actor.getRole() != AccountRole.COMPTABLE && actor.getRole() != AccountRole.DIRECTEUR_GENERAL) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La gestion des contrats est réservée à la comptabilité et à la Direction.");
         }
+    }
+
+    private boolean canViewAllContracts(UserAccount actor) {
+        return canManageAny(actor);
     }
 
     private boolean canManageAny(UserAccount actor) {
@@ -287,6 +298,9 @@ public class ContractService {
     }
 
     private boolean canEditEmployee(UserAccount actor, UserAccount employee) {
+        if (employee.getRole() == AccountRole.ADMINISTRATEUR) {
+            return false;
+        }
         if (actor.getRole() == AccountRole.COMPTABLE) {
             return !employee.getId().equals(actor.getId());
         }
@@ -306,10 +320,9 @@ public class ContractService {
 
     private UserAccount findActiveEmployee(UUID employeeId) {
         UserAccount employee = accounts.findById(employeeId)
-                .orElseThrow(() -> new AccountNotFoundException("L’employé sélectionné n’existe pas."));
-        if (employee.getStatus() != AccountStatus.ACTIVE
-                || employee.getRole() == AccountRole.ADMINISTRATEUR) {
-            throw new IllegalArgumentException("Un contrat ne peut être rattaché qu’à un compte employé actif.");
+                .orElseThrow(() -> new AccountNotFoundException("L'employe selectionne n'existe pas."));
+        if (employee.getStatus() != AccountStatus.ACTIVE || employee.getRole() == AccountRole.ADMINISTRATEUR) {
+            throw new IllegalArgumentException("Un contrat ne peut etre rattache qu'a un compte employe actif.");
         }
         return employee;
     }
@@ -333,18 +346,28 @@ public class ContractService {
     private void validatePayload(ContractPayload payload) {
         if (payload == null || payload.employeeId() == null || payload.type() == null
                 || payload.startDate() == null || payload.jobTitle() == null || payload.jobTitle().isBlank()
-                || payload.department() == null || payload.department().isBlank()) {
-            throw new IllegalArgumentException("Les champs obligatoires du contrat doivent être renseignés.");
+                || payload.department() == null || payload.department().isBlank()
+                || payload.baseSalaryAmount() == null
+                || payload.baseSalaryAmount().compareTo(java.math.BigDecimal.ZERO) < 0
+                || payload.baseSalaryAmount().stripTrailingZeros().scale() > 0) {
+            throw new IllegalArgumentException("Les champs obligatoires du contrat doivent etre renseignes.");
         }
         boolean fixedTerm = payload.type() == ContractType.CDD || payload.type() == ContractType.STAGE;
         if (fixedTerm != (payload.endDate() != null)) {
             throw new IllegalArgumentException("La date de fin est obligatoire pour un CDD ou un stage et interdite pour un CDI.");
         }
         if (payload.endDate() != null && !payload.endDate().isAfter(payload.startDate())) {
-            throw new IllegalArgumentException("La date de fin doit être postérieure à la date de début.");
+            throw new IllegalArgumentException("La date de fin doit etre posterieure a la date de debut.");
         }
-        if (payload.internalNotes() != null && payload.internalNotes().length() > 2000) {
-            throw new IllegalArgumentException("Les notes internes ne peuvent pas dépasser 2 000 caractères.");
+        if (payload.monthlyBonusAmount() != null
+                && (payload.monthlyBonusAmount().compareTo(java.math.BigDecimal.ZERO) < 0
+                        || payload.monthlyBonusAmount().stripTrailingZeros().scale() > 0)) {
+            throw new IllegalArgumentException("Le montant des primes doit etre un entier positif ou nul.");
+        }
+        if ((payload.internalNotes() != null && payload.internalNotes().length() > 2000)
+                || (payload.bonusDetails() != null && payload.bonusDetails().length() > 2000)
+                || (payload.otherBenefits() != null && payload.otherBenefits().length() > 2000)) {
+            throw new IllegalArgumentException("Les champs de notes et d'avantages sont limites a 2 000 caracteres.");
         }
     }
 

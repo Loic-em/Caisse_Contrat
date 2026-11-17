@@ -159,24 +159,23 @@ public class AccountService {
     }
 
     private Hierarchy resolveHierarchy(AccountRequest request, UUID accountId) {
-        if (request.role() == AccountRole.DIRECTEUR_GENERAL) {
-            if (request.managerN1Id() != null || request.managerN2Id() != null) {
-                throw new IllegalArgumentException("Ce rôle ne peut pas avoir de supérieur.");
-            }
+        if (request.role() == AccountRole.ADMINISTRATEUR) {
             return new Hierarchy(null, null);
         }
-
         if (request.managerN1Id() == null) {
+            if (request.role() == AccountRole.DIRECTEUR_GENERAL) {
+                return new Hierarchy(null, null);
+            }
             throw new IllegalArgumentException("Le responsable N+1 est obligatoire.");
         }
         UserAccount managerN1 = findActiveManager(request.managerN1Id(), "N+1");
         if (managerN1.getId().equals(accountId)) {
-            throw new IllegalArgumentException("Un compte ne peut pas être son propre supérieur.");
+            throw new IllegalArgumentException("Un compte ne peut pas etre son propre superieur.");
         }
 
         if (managerN1.getRole() == AccountRole.DIRECTEUR_GENERAL) {
             if (request.managerN2Id() != null) {
-                throw new IllegalArgumentException("Un compte rattaché au directeur général ne peut pas avoir de N+2.");
+                throw new IllegalArgumentException("Un compte rattache au directeur general ne peut pas avoir de N+2.");
             }
             return new Hierarchy(managerN1, null);
         }
@@ -186,11 +185,11 @@ public class AccountService {
         }
         UserAccount managerN2 = findActiveManager(request.managerN2Id(), "N+2");
         if (managerN2.getId().equals(accountId) || managerN2.getId().equals(managerN1.getId())) {
-            throw new IllegalArgumentException("La hiérarchie sélectionnée n’est pas valide.");
+            throw new IllegalArgumentException("La hierarchie selectionnee n'est pas valide.");
         }
         if (managerN1.getManagerN1() == null
                 || !managerN1.getManagerN1().getId().equals(managerN2.getId())) {
-            throw new IllegalArgumentException("Le N+2 doit être le N+1 du responsable N+1.");
+            throw new IllegalArgumentException("Le N+2 doit etre le N+1 du responsable N+1.");
         }
         return new Hierarchy(managerN1, managerN2);
     }
@@ -199,8 +198,8 @@ public class AccountService {
         UserAccount manager = accounts.findById(managerId)
                 .orElseThrow(() -> new AccountNotFoundException(
                         "Le responsable " + level + " sélectionné n’existe pas."));
-        if (manager.getStatus() != AccountStatus.ACTIVE) {
-            throw new IllegalArgumentException("Le responsable " + level + " est désactivé.");
+        if (manager.getStatus() != AccountStatus.ACTIVE || manager.getRole() == AccountRole.ADMINISTRATEUR) {
+            throw new IllegalArgumentException("Le responsable selectionne n'est pas un compte actif autorise.");
         }
         return manager;
     }

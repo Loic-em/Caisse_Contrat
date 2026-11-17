@@ -1,9 +1,5 @@
 # Documentation du projet « Caisse Contrat »
 
-> Document explicatif complet du projet, rédigé pour être compris facilement par toute personne, même sans connaissance préalable du code. Chaque fichier est présenté avec **son rôle** et **sa spécialité**.
-
----
-
 ## 1. Qu'est-ce que ce projet ?
 
 **Caisse Contrat** est une application web interne pour **Digin Factory**. Elle sert à gérer :
@@ -202,7 +198,7 @@ Scripts Flyway exécutés au démarrage, dans l'ordre :
 
 ## 4. FRONTEND
 
-Dossier : `frontend/frontend/src/`
+Dossier : `frontend/src/`
 
 ### 4.1 Entrée et navigation
 
@@ -298,7 +294,7 @@ Dossier : `backend/src/test/`
 
 1. Copier `backend/.env.example` → `backend/.env` et définir l'admin initial (e-mail + mot de passe ≥ 12 caractères).
 2. Démarrer le backend : `cd backend && .\mvnw.cmd spring-boot:run` (port 8081).
-3. Démarrer le frontend : `cd frontend/frontend && npm run dev` (port 5173).
+3. Démarrer le frontend : `cd frontend && npm run dev` (port 5173).
 4. Ouvrir `http://localhost:5173`.
 
 ---

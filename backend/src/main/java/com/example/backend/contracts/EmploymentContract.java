@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -56,6 +57,18 @@ public class EmploymentContract {
     @JoinColumn(name = "supervisor_id", nullable = false)
     private UserAccount supervisor;
 
+    @Column(name = "base_salary_amount", precision = 17, scale = 0)
+    private BigDecimal baseSalaryAmount;
+
+    @Column(name = "monthly_bonus_amount", precision = 17, scale = 0)
+    private BigDecimal monthlyBonusAmount;
+
+    @Column(name = "bonus_details", length = 2000)
+    private String bonusDetails;
+
+    @Column(name = "other_benefits", length = 2000)
+    private String otherBenefits;
+
     @Column(name = "internal_notes", length = 2000)
     private String internalNotes;
 
@@ -87,6 +100,10 @@ public class EmploymentContract {
             String workplace,
             UserAccount supervisor,
             String internalNotes,
+            BigDecimal baseSalaryAmount,
+            BigDecimal monthlyBonusAmount,
+            String bonusDetails,
+            String otherBenefits,
             UUID createdById,
             Instant now) {
         this.id = id;
@@ -94,7 +111,8 @@ public class EmploymentContract {
         this.status = ContractStatus.BROUILLON;
         this.createdById = createdById;
         this.createdAt = now;
-        update(type, startDate, endDate, jobTitle, department, probationPeriod, workplace, supervisor, internalNotes, now);
+        update(type, startDate, endDate, jobTitle, department, probationPeriod, workplace, supervisor,
+                internalNotes, baseSalaryAmount, monthlyBonusAmount, bonusDetails, otherBenefits, now);
     }
 
     public void update(
@@ -107,6 +125,10 @@ public class EmploymentContract {
             String workplace,
             UserAccount supervisor,
             String internalNotes,
+            BigDecimal baseSalaryAmount,
+            BigDecimal monthlyBonusAmount,
+            String bonusDetails,
+            String otherBenefits,
             Instant now) {
         this.type = type;
         this.startDate = startDate;
@@ -116,6 +138,10 @@ public class EmploymentContract {
         this.probationPeriod = normalizeOptional(probationPeriod);
         this.workplace = normalizeOptional(workplace);
         this.supervisor = supervisor;
+        this.baseSalaryAmount = baseSalaryAmount;
+        this.monthlyBonusAmount = monthlyBonusAmount;
+        this.bonusDetails = normalizeOptional(bonusDetails);
+        this.otherBenefits = normalizeOptional(otherBenefits);
         this.internalNotes = internalNotes == null || internalNotes.isBlank() ? null : internalNotes.trim();
         this.updatedAt = now;
     }
@@ -168,6 +194,22 @@ public class EmploymentContract {
 
     public UserAccount getSupervisor() {
         return supervisor;
+    }
+
+    public BigDecimal getBaseSalaryAmount() {
+        return baseSalaryAmount;
+    }
+
+    public BigDecimal getMonthlyBonusAmount() {
+        return monthlyBonusAmount;
+    }
+
+    public String getBonusDetails() {
+        return bonusDetails;
+    }
+
+    public String getOtherBenefits() {
+        return otherBenefits;
     }
 
     public String getInternalNotes() {

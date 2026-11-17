@@ -74,7 +74,8 @@ public class SupportingDocumentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Seul le bénéficiaire peut déposer ses justificatifs.");
         }
-        if (requestView.status() != CashRequestStatus.DECAISSEE) {
+        if (requestView.status() != CashRequestStatus.DECAISSEE
+                && requestView.status() != CashRequestStatus.EN_REGULARISATION) {
             throw new IllegalArgumentException("Les justificatifs peuvent être déposés après le décaissement.");
         }
         if (documentType == null || documentType.isBlank() || documentType.trim().length() > 120

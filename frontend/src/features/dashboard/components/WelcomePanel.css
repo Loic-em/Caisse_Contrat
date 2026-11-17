@@ -1,0 +1,187 @@
+/* Bannière d'accueil et illustration décorative construite uniquement en CSS. */
+.welcome-panel {
+  position: relative;
+  min-height: 208px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 32px 38px;
+  border: 1px solid #c4c7ca;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 84% 7%, rgb(0 170 231 / 12%) 0, transparent 38%),
+    radial-gradient(ellipse at 92% 102%, rgb(0 55 110 / 8%) 0, transparent 42%),
+    linear-gradient(112deg, #edf0f4 0%, #f2f2f3 52%, #ffffff 100%);
+  box-shadow: var(--shadow-card);
+}
+
+.welcome-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-copy .eyebrow {
+  margin: 0 0 11px;
+  color: #00aae7;
+}
+
+.welcome-copy h1 {
+  margin: 0;
+  color: var(--color-brand-blue-deep);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 3.2vw, 39px);
+  font-weight: 500;
+  letter-spacing: -.8px;
+  line-height: 1.2;
+}
+
+.wave {
+  display: inline-block;
+  font-size: 24px;
+  vertical-align: 2px;
+}
+
+.welcome-copy > p:last-child {
+  margin: 10px 0 0;
+  color: #262f3c;
+  font-size: 14px;
+}
+
+.welcome-art {
+  position: relative;
+  width: 220px;
+  height: 140px;
+  flex: 0 0 220px;
+}
+
+.art-orbit {
+  position: absolute;
+  border: 1px solid #c4c7ca;
+  border-radius: 50%;
+  transform: rotate(-24deg);
+}
+
+.orbit-one {
+  width: 188px;
+  height: 100px;
+  top: 21px;
+  left: 18px;
+}
+
+.orbit-two {
+  width: 144px;
+  height: 126px;
+  top: 8px;
+  left: 39px;
+}
+
+.art-card {
+  position: absolute;
+  top: 29px;
+  left: 69px;
+  width: 98px;
+  height: 76px;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #c4c7ca;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 14px 28px rgb(38 47 60 / 12%);
+  transform: rotate(5deg);
+}
+
+.art-card-top {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 9px;
+}
+
+.art-card-top span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #c4c7ca;
+}
+
+.art-card-line {
+  height: 4px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  background: #edf0f4;
+}
+
+.art-card-line.long {
+  width: 71px;
+}
+
+.art-card-line.medium {
+  width: 50px;
+}
+
+.art-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 11px;
+}
+
+.art-card-bottom span:first-child {
+  width: 26px;
+  height: 7px;
+  border-radius: 4px;
+  background: #00aae7;
+}
+
+.art-card-bottom span:last-child {
+  width: 20px;
+  height: 7px;
+  border-radius: 4px;
+  background: #00376e;
+}
+
+.art-sparkle {
+  position: absolute;
+  top: 20px;
+  right: 27px;
+  color: #00aae7;
+}
+
+@media (max-width: 760px) {
+  /* L'illustration se réduit progressivement pour laisser de la place au texte. */
+  .welcome-panel {
+    min-height: 175px;
+    padding: 25px;
+  }
+
+  .welcome-art {
+    width: 155px;
+    flex-basis: 155px;
+    transform: scale(0.82);
+    transform-origin: center right;
+    margin-left: -25px;
+  }
+}
+
+@media (max-width: 520px) {
+  .welcome-panel {
+    min-height: 140px;
+    padding: 19px;
+  }
+
+  .welcome-copy h1 {
+    font-size: 27px;
+  }
+
+  .welcome-copy > p:last-child {
+    max-width: 220px;
+    font-size: 10px;
+    line-height: 1.55;
+  }
+
+  .welcome-art {
+    width: 90px;
+    flex-basis: 90px;
+    margin-left: -55px;
+    opacity: 0.7;
+  }
+}

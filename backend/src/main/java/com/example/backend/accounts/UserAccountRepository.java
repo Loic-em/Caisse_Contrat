@@ -17,6 +17,7 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, UUID> 
     boolean existsByRole(AccountRole role);
 
     boolean existsByRoleAndActiveTrue(AccountRole role);
+    boolean existsByManagerN1_IdOrManagerN2_Id(UUID managerN1Id, UUID managerN2Id);
 
     Optional<UserAccount> findByEmailIgnoreCase(String email);
 

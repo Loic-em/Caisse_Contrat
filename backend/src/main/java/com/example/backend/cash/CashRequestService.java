@@ -107,6 +107,13 @@ public class CashRequestService {
                 payload.category(),
                 payload.estimatedAmount(),
                 payload.attachmentName(),
+                payload.missionPurpose(),
+                payload.missionReference(),
+                payload.contactName(),
+                payload.contactPhone(),
+                payload.activityArea(),
+                payload.activityDetails(),
+                payload.clientPartner(),
                 requester,
                 now,
                 now);
@@ -137,6 +144,13 @@ public class CashRequestService {
                 payload.category(),
                 payload.estimatedAmount(),
                 payload.attachmentName(),
+                payload.missionPurpose(),
+                payload.missionReference(),
+                payload.contactName(),
+                payload.contactPhone(),
+                payload.activityArea(),
+                payload.activityDetails(),
+                payload.clientPartner(),
                 now);
         requests.save(request);
         recordEvent(request, requester, "MODIFIED", previousStatus, null);
@@ -148,9 +162,8 @@ public class CashRequestService {
         UserAccount requester = findActiveAccount(requesterEmail);
         CashRequest request = findRequest(id);
         requireRequester(requester, request);
-        if (requester.getRole() == AccountRole.DIRECTEUR_GENERAL) {
-            throw new IllegalArgumentException(
-                    "Le valideur désigné pour les demandes de la Direction doit être configuré avant la soumission.");
+        if (request.getStartDate().isBefore(LocalDate.now(clock))) {
+            throw new IllegalArgumentException("La date de debut ne peut pas etre dans le passe au moment de la soumission.");
         }
         UserAccount managerN1 = requester.getManagerN1();
         UserAccount managerN2 = requester.getManagerN2();
@@ -177,10 +190,10 @@ public class CashRequestService {
         Instant now = clock.instant();
 
         if (previousStatus == CashRequestStatus.SOUMISE) {
-            requireValidator(validator, request.getValidatorN1(), "N+1");
+            requireValidator(validator, request.getValidatorN1(), "N+1", request);
             request.approveN1(now);
         } else if (previousStatus == CashRequestStatus.VALIDEE_N1) {
-            requireValidator(validator, request.getValidatorN2(), "N+2");
+            requireValidator(validator, request.getValidatorN2(), "N+2", request);
             request.approveN2(now);
         } else {
             throw new IllegalArgumentException("Cette demande n’attend pas une validation hiérarchique.");
@@ -206,9 +219,9 @@ public class CashRequestService {
         CashRequest request = findRequest(id);
         CashRequestStatus previousStatus = request.getStatus();
         if (previousStatus == CashRequestStatus.SOUMISE) {
-            requireValidator(validator, request.getValidatorN1(), "N+1");
+            requireValidator(validator, request.getValidatorN1(), "N+1", request);
         } else if (previousStatus == CashRequestStatus.VALIDEE_N1) {
-            requireValidator(validator, request.getValidatorN2(), "N+2");
+            requireValidator(validator, request.getValidatorN2(), "N+2", request);
         } else {
             throw new IllegalArgumentException("Cette demande n’attend pas une décision hiérarchique.");
         }
@@ -274,11 +287,14 @@ public class CashRequestService {
         }
     }
 
-    private void requireValidator(UserAccount actor, UserAccount expected, String level) {
+    private void requireValidator(UserAccount actor, UserAccount expected, String level, CashRequest request) {
+        if (request.getRequester() != null && request.getRequester().getId().equals(actor.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Le demandeur ne peut pas valider sa propre demande.");
+        }
         if (expected == null || !expected.getId().equals(actor.getId())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "Seul le responsable " + level + " enregistré peut prendre cette décision.");
+                    "Seul le responsable " + level + " enregistre peut prendre cette decision.");
         }
     }
 

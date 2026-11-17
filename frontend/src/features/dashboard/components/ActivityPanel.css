@@ -1,0 +1,80 @@
+/* Carte de l'historique ; elle montre un état vide tant que les données ne sont pas reliées. */
+.activity-panel {
+  min-height: 237px;
+  padding: 21px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  box-sizing: border-box;
+  box-shadow: var(--shadow-card);
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-heading h2 {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.panel-heading p {
+  margin: 5px 0 0;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.panel-icon {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--color-brand-blue-hover);
+  background: var(--color-brand-cyan-light);
+}
+
+.empty-state {
+  min-height: 149px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 9px;
+  border-radius: 12px;
+  color: #00376e;
+  background: var(--color-brand-soft);
+}
+
+.empty-state strong {
+  color: var(--color-ink-soft);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.empty-state > span:last-child {
+  max-width: 270px;
+  margin-top: 5px;
+  color: var(--color-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .activity-panel {
+    min-height: 210px;
+  }
+}
