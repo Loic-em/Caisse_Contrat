@@ -44,6 +44,19 @@
 
 ## Journal des modifications
 
+### 2026-11-18 — Corrections FR page « Justificatifs de dépenses »
+- **Fichier touché** : `frontend/src/features/requests/pages/SupportingDocumentsPage.jsx`.
+- **Détail** : correction des accents/mots tronqués et de la ponctuation — statuts `Accepté`/`Rejeté`, « pour rejeter un justificatif », « a été accepté/rejeté », « a été rejeté », « Aucune pièce déposée », « Montant justifié (FCFA) », catégories `Reçu`, `Hébergement`, `Parking et stationnement`, `Fournitures et matériel`, « Choisissez une catégorie », séparateurs `·` dans l'en-tête et le détail des pièces, « Motif de rejet pour » / « Motif obligatoire si rejet ».
+- **Vérification** : `npm run build` OK (dist/assets/index-B_az-StN.js).
+
+### 2026-11-18 — Erreur 403 sur « Fixer le montant »
+- **Symptôme** : clic sur « Fixer le montant » → « La requête a échoué (HTTP 403). » sans détail.
+- **Cause** : `CashRequestService.requireAccountingPermission` (séparation des tâches) renvoie `ResponseStatusException(403)` quand un comptable traite **sa propre demande** ; le message n'était pas transmis au frontend (Spring Boot n'inclut pas le message par défaut → message générique). Par ailleurs le bouton restait affiché pour la demande du demandeur connecté.
+- **Fichiers touchés** :
+  - `backend/src/main/java/com/example/backend/cash/ApiExceptionHandler.java` : ajout d'un `@ExceptionHandler(ResponseStatusException.class)` qui renvoie `{"message": ex.getReason()}` avec le bon statut → le motif réel est désormais visible côté UI.
+  - `frontend/src/features/requests/pages/CashRequestsPage.jsx` : `canReviewAmount` et `canIssueVoucher` incluent désormais `!isRequester` (garde `requesterId !== currentUser.id`), aligné sur les visas Caisse.
+- **Vérification** : `mvnw compile -o` OK ; `npm run build` OK (dist/assets/index-m19v50z3.js).
+
 ### 2026-11-17 — Correction des accents et de l'encodage
 - **Fichiers touchés** :
   - `backend/src/main/resources/application.properties` (ajout `server.servlet.encoding.charset=UTF-8`, `enabled=true`, `force=true`)
@@ -80,3 +93,9 @@
   - `frontend/src/features/requests/pages/SupportingDocumentsPage.jsx`
 - **Détail** : correction systématique des libellés/messages FR corrompus ou fautifs (accents, apostrophes, accords, ponctuation) — ex. « Période d’essai », « Rémunération de base mensuelle », « Détail des primes », « Indemnités et autres avantages », « Enregistrer/Enregistrement… », « Sélectionnez/Sélectionner », « aujourd’hui », « Non renseignée/Aucune renseignée », « Montant en lettres », « Bénéficiaire », « bon d’entrée/d’origine », « clôture/clôturé », « après », « déposée(s)/déposer », « mission », « Autorisation préalable », « APRÈS MISSION », option « Autre », etc. ; corrections associées (`accept="image/*"`, `acceptedDocumentAmount` dans `RegularizationPanel.jsx`).
 - **Vérification** : `npm run build` OK (`dist/assets/index-Be3SOl37.js`, `dist/assets/index-Bx3m4kbs.css`). Recherche des motifs de corruption résiduels dans `src` : aucun résultat. Contrôle visuel navigateur recommandé.
+
+## 2026-11-19
+- SupportingDocumentsPage.jsx : ajout d'un useEffect qui fait d�filer la page vers le message d'erreur apr�s un �chec d'acceptation (� Le montant accept� d�passerait le solde restant � r�gulariser. �). Corrig� une erreur de syntaxe JSX.
+
+## Notifications (2026-11-19)
+- Backend: entite Notification, repository, service, controller /api/notifications. Frontend: notificationsApi.js + NotificationsPage.jsx.

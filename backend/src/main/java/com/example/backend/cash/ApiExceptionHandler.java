@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -39,5 +40,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(CashRequestNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(CashRequestNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException ex) {
+        String reason = ex.getReason() != null ? ex.getReason() : "La requête a échoué.";
+        return ResponseEntity.status(ex.getStatusCode()).body(Map.of("message", reason));
     }
 }

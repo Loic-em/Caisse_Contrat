@@ -569,10 +569,10 @@ function CashRequestsPage({
             const isRequester = request.requesterId === currentUser.id
             const isN1 = request.status === 'SOUMISE' && request.validatorN1Id === currentUser.id
             const isN2 = request.status === 'VALIDEE_N1' && request.validatorN2Id === currentUser.id
-            const canReviewAmount = request.status === 'VALIDEE'
+            const canReviewAmount = !isRequester && request.status === 'VALIDEE'
               && (currentUser.role === 'COMPTABLE'
                 || (currentUser.role === 'ADJOINT_COMPTABLE' && request.requesterRole === 'COMPTABLE'))
-            const canIssueVoucher = request.status === 'MONTANT_ARRETE'
+            const canIssueVoucher = !isRequester && request.status === 'MONTANT_ARRETE'
               && (currentUser.role === 'COMPTABLE'
                 || (currentUser.role === 'ADJOINT_COMPTABLE' && request.requesterRole === 'COMPTABLE'))
             const canSubmit = isRequester && (request.status === 'DRAFT' || request.status === 'A_CORRIGER')

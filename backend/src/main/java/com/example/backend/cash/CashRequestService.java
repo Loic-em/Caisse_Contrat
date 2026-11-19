@@ -25,7 +25,12 @@ public class CashRequestService {
     private final CashRequestEventRepository events;
     private final UserAccountRepository accounts;
     private final Clock clock;
-    private final int minimumRejectionReasonLength;
+    private com.example.backend.notification.NotificationService notificationService;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public void setNotificationService(com.example.backend.notification.NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     @Autowired
     public CashRequestService(
@@ -119,6 +124,9 @@ public class CashRequestService {
                 now);
         requests.save(request);
         recordEvent(request, requester, "CREATED", null, null);
+        if (notificationService != null) {
+            notificationService.create(requester.getEmail(), "Nouvelle demande", "Votre demande de caisse a été créée.");
+        }
         return CashRequestResponse.from(request);
     }
 

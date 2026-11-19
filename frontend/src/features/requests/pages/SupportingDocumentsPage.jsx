@@ -13,8 +13,8 @@ const amountFormatter = new Intl.NumberFormat('fr-FR')
 const dateFormatter = new Intl.DateTimeFormat('fr-FR')
 const statusLabels = {
   A_CONTROLER: 'à contrôler',
-  ACCEPTE: 'Accept',
-  REJETE: 'Rejet',
+  ACCEPTE: 'Accepté',
+  REJETE: 'Rejeté',
 }
 
 function formatDate(value) {
@@ -93,6 +93,17 @@ function SupportingDocumentsPage({ currentUser, focusRequestId = '', onOpenRegul
   }, [])
 
   useEffect(() => {
+    if (!error) return
+    const frame = window.requestAnimationFrame(() => {
+      document.querySelector('.supporting-documents-message.is-error')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [error])
+
+  useEffect(() => {
     if (isLoading || !focusRequestId) return undefined
 
     const frame = window.requestAnimationFrame(() => {
@@ -143,7 +154,7 @@ function SupportingDocumentsPage({ currentUser, focusRequestId = '', onOpenRegul
   async function handleReview(request, document, decision) {
     const review = reviewByDocument[document.id] || {}
     if (decision === 'REJETE' && !review.reason?.trim()) {
-      setError('Un motif est obligatoire pour rejetéer un justificatif.')
+      setError('Un motif est obligatoire pour rejeter un justificatif.')
       return
     }
     setPendingAction(document.id)
@@ -160,7 +171,7 @@ function SupportingDocumentsPage({ currentUser, focusRequestId = '', onOpenRegul
         ...current,
         [request.id]: current[request.id].map((item) => item.id === updated.id ? updated : item),
       }))
-      setSuccess(`Le justificatif a t ${decision === 'ACCEPTE' ? 'accepté' : 'rejeté'}.`)
+      setSuccess(`Le justificatif a été ${decision === 'ACCEPTE' ? 'accepté' : 'rejeté'}.`)
     } catch (reviewError) {
       setError(reviewError.message)
     } finally {
@@ -233,7 +244,7 @@ function SupportingDocumentsPage({ currentUser, focusRequestId = '', onOpenRegul
             <header>
               <div>
                 <h2>{request.subject}</h2>
-                <p>{request.requesterName}  {request.location}  · mission terminée le {formatDate(request.endDate)}</p>
+                <p>{request.requesterName} · {request.location} · mission terminée le {formatDate(request.endDate)}</p>
               </div>
               <div className="supporting-request-header-actions">
                 <strong>{amountFormatter.format(Number(request.finalAmount))} FCFA</strong>
@@ -259,20 +270,20 @@ function SupportingDocumentsPage({ currentUser, focusRequestId = '', onOpenRegul
                       [request.id]: { ...current[request.id], documentType: event.target.value },
                     }))}
                   >
-                    <option value="">Choisissez une catgorie</option>
+                    <option value="">Choisissez une catégorie</option>
                     <option value="Facture">Facture</option>
-                    <option value="Reu">Reu</option>
+                    <option value="Reçu">Reçu</option>
                     <option value="Ticket de transport">Ticket de transport</option>
                     <option value="Carburant">Carburant</option>
-                    <option value="Hbergement">Hbergement</option>
+                    <option value="Hébergement">Hébergement</option>
                     <option value="Restauration">Restauration</option>
-                    <option value="Page et stationnement">Page et stationnement</option>
-                    <option value="Fournitures et matriel">Fournitures et matriel</option>
+                    <option value="Parking et stationnement">Parking et stationnement</option>
+                    <option value="Fournitures et matériel">Fournitures et matériel</option>
                     <option value="Autre">Autre</option>
                   </select>
                 </label>
                 <label>
-                  Montant justifi (FCFA)
+                  Montant justifié (FCFA)
                   <input
                     required
                     disabled={!uploadsEnabled || isSubmitting}
@@ -326,12 +337,12 @@ function SupportingDocumentsPage({ currentUser, focusRequestId = '', onOpenRegul
               document.status === 'REJETE' && !documents.some((candidate) => candidate.replacesId === document.id)
             )) && isBeneficiary && uploadsEnabled && (
               <p className="supporting-replacement-notice">
-                Un justificatif a t rejeté : vous pouvez déposer une pièce de remplacement.
+                Un justificatif a été rejeté : vous pouvez déposer une pièce de remplacement.
               </p>
             )}
 
             {documents.length === 0 ? (
-              <p className="supporting-no-documents">Aucune pièce déposé.</p>
+                <p className="supporting-no-documents">Aucune pièce déposée.</p>
             ) : (
               <ul className="supporting-document-list">
                 {documents.map((document) => {
@@ -342,9 +353,9 @@ function SupportingDocumentsPage({ currentUser, focusRequestId = '', onOpenRegul
                   return (
                     <li key={document.id}>
                       <div className="supporting-document-details">
-                        <strong>{document.documentType}  {document.fileName}</strong>
-                        <span>{amountFormatter.format(Number(document.amount))} FCFA  pièce du {formatDate(document.documentDate)}</span>
-                        <span>Déposé par {document.uploadedByName}  {dateFormatter.format(new Date(document.uploadedAt))}</span>
+                        <strong>{document.documentType} · {document.fileName}</strong>
+                        <span>{amountFormatter.format(Number(document.amount))} FCFA · pièce du {formatDate(document.documentDate)}</span>
+                        <span>Déposé par {document.uploadedByName} · le {dateFormatter.format(new Date(document.uploadedAt))}</span>
                         {document.rejectionReason && <span className="supporting-rejection-reason">{document.rejectionReason}</span>}
                       </div>
                       <a href={`/api/cash-requests/${request.id}/supporting-documents/${document.id}/file`} target="_blank" rel="noreferrer">
@@ -356,8 +367,8 @@ function SupportingDocumentsPage({ currentUser, focusRequestId = '', onOpenRegul
                       {canAct && (
                         <div className="supporting-review-actions">
                           <input
-                            aria-label={`Motif de rejeté pour ${document.fileName}`}
-                            placeholder="Motif obligatoire si rejeté"
+                            aria-label={`Motif de rejet pour ${document.fileName}`}
+                            placeholder="Motif obligatoire si rejet"
                             value={reviewByDocument[document.id]?.reason || ''}
                             onChange={(event) => setReviewByDocument((current) => ({
                               ...current,

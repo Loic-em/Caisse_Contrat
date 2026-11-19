@@ -335,3 +335,5 @@ BROUILLON → SOUMISE → (VALIDEE_N1 si N+1≠DG) → VALIDEE → MONTANT_ARRET
 ---
 
 *Document généré pour le projet Caisse Contrat.*
+## Mise a jour 2026-11-19
+- Justificatifs de depenses : defilement automatique vers le message d'erreur lorsqu'un montant accepte depasserait le solde restant a regulariser.
